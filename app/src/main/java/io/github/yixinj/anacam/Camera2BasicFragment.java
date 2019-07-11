@@ -70,6 +70,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -422,22 +423,22 @@ public class Camera2BasicFragment extends Fragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_camera2_basic, container, false);
     }
 
     @Override
-    public void onViewCreated(final View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, Bundle savedInstanceState) {
         view.findViewById(R.id.picture).setOnClickListener(this);
         view.findViewById(R.id.info).setOnClickListener(this);
-        mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+        mTextureView = view.findViewById(R.id.texture);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
+        mFile = new File(Objects.requireNonNull(getActivity()).getExternalFilesDir(null), "pic.jpg");
     }
 
     @Override
@@ -493,6 +494,7 @@ public class Camera2BasicFragment extends Fragment
     @SuppressWarnings("SuspiciousNameCombination")
     private void setUpCameraOutputs(int width, int height) {
         Activity activity = getActivity();
+        assert activity != null;
         CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
         try {
             for (String cameraId : manager.getCameraIdList()) {
@@ -603,7 +605,7 @@ public class Camera2BasicFragment extends Fragment
      * Opens the camera specified by {@link Camera2BasicFragment#mCameraId}.
      */
     private void openCamera(int width, int height) {
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+        if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission();
             return;
@@ -807,7 +809,7 @@ public class Camera2BasicFragment extends Fragment
     }
 
     private void captureStillPicture() {
-        captureStillPicture(1600, 60000L);
+        captureStillPicture(1600, 100000L);
     }
 
     /**
@@ -921,20 +923,10 @@ public class Camera2BasicFragment extends Fragment
 
     private void setAutoFlash(CaptureRequest.Builder requestBuilder) {
         // Turn off autoflash
-        if (mFlashSupported) {
+//        if (mFlashSupported) {
 //            requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
 //                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-        }
-    }
-
-    private void setAuto(CaptureRequest.Builder requestBuilder) {
-        // Turn on AE, AF, AWB
-        requestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-        requestBuilder.set(CaptureRequest.CONTROL_AWB_MODE,
-                CaptureRequest.CONTROL_AWB_MODE_AUTO);
-        requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                CaptureRequest.CONTROL_AE_MODE_ON);
+//        }
     }
 
     /**
@@ -1013,11 +1005,13 @@ public class Camera2BasicFragment extends Fragment
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final Activity activity = getActivity();
+            assert getArguments() != null;
             return new AlertDialog.Builder(activity)
                     .setMessage(getArguments().getString(ARG_MESSAGE))
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
+                            assert activity != null;
                             activity.finish();
                         }
                     })
@@ -1040,6 +1034,7 @@ public class Camera2BasicFragment extends Fragment
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            assert parent != null;
                             parent.requestPermissions(new String[]{Manifest.permission.CAMERA},
                                     REQUEST_CAMERA_PERMISSION);
                         }
@@ -1048,6 +1043,7 @@ public class Camera2BasicFragment extends Fragment
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    assert parent != null;
                                     Activity activity = parent.getActivity();
                                     if (activity != null) {
                                         activity.finish();
@@ -1058,17 +1054,14 @@ public class Camera2BasicFragment extends Fragment
         }
     }
 
-    public void analyseImage(View view) {
-        String path = "./files/pic.jpg";
-
-        // Analysis works only if path exists
-        if (path != null) {
-            Intent intent = new Intent(getActivity(), Analysis.class);
-            intent.putExtra("path", path);
-//            intent.putExtra("numContours", 3);
-
-
-            startActivity(intent);
-        }
+    private void setAuto(CaptureRequest.Builder requestBuilder) {
+        // Turn on AE, AF, AWB
+        requestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+                CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+        requestBuilder.set(CaptureRequest.CONTROL_AWB_MODE,
+                CaptureRequest.CONTROL_AWB_MODE_AUTO);
+        requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                CaptureRequest.CONTROL_AE_MODE_ON);
     }
+
 }

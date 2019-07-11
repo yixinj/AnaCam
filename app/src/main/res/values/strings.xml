@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">AnaCam</string>
-    <string name="upload_title">Upload Image</string>
+    <string name="upload_title">Select Image</string>
     <string name="btn_pick_image">Pick Image</string>
     <string name="btn_analyse">Analyse</string>
     <string name="picture">Picture</string>
     <string name="description_info">Info</string>
-    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="request_permission">Camera permission required.</string>
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
     <string name="intro_message">Intro message</string>
+    <string name="take_photo_desc">Take a picture</string>
+    <string name="upload_image_desc">Upload an image</string>
 </resources>

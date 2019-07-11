@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UploadImage">
+    tools:context=".SelectImage">
 
 
     <ImageView
@@ -18,7 +18,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        tools:srcCompat="@tools:sample/avatars[3]" />
+        tools:srcCompat="@tools:sample/avatars[3]"
+        android:contentDescription="@string/upload_image_desc" />
 
     <TextView
         android:id="@+id/textView"

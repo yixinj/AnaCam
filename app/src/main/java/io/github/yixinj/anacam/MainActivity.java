@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
      * Called when the user taps the Upload button
      */
     public void uploadImage(View view) {
-        Intent intent = new Intent(this, UploadImage.class);
+        Intent intent = new Intent(this, SelectImage.class);
         startActivity(intent);
     }
 
