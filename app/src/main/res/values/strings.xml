@@ -10,4 +10,6 @@
     <string name="intro_message">Intro message</string>
     <string name="take_photo_desc">Take a picture</string>
     <string name="upload_image_desc">Upload an image</string>
+    <string name="exposure_label">Exposure</string>
+    <string name="iso_label">ISO</string>
 </resources>

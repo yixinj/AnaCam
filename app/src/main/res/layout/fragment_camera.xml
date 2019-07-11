@@ -39,6 +39,7 @@
         android:background="@color/primaryDarkColor"
         app:layout_constraintBottom_toBottomOf="parent">
 
+
         <ImageButton
             android:id="@+id/picture"
             android:layout_width="64dp"
@@ -57,63 +58,102 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <SeekBar
-            android:id="@+id/iso_slider"
-            style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:max="10"
-            android:progress="3"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/picture"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
-        <SeekBar
-            android:id="@+id/exposure_slider"
-            style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/exposure_value"
+            android:layout_width="300px"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:max="10"
-            android:progress="3"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:ems="10"
+            android:inputType="number"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:text="1000000000"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toBottomOf="@+id/exposure_label"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/picture"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <EditText
+            android:id="@+id/iso_value"
+            android:layout_width="300px"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:ems="10"
+            android:inputType="number"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:text="1600"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toBottomOf="@+id/exposure_label"
+            app:layout_constraintEnd_toStartOf="@+id/picture"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!--<SeekBar-->
+        <!--android:id="@+id/iso_slider"-->
+        <!--style="@style/Widget.AppCompat.SeekBar.Discrete"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:max="10"-->
+        <!--android:progress="3"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toStartOf="@+id/picture"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+        <!--<SeekBar-->
+        <!--android:id="@+id/exposure_slider"-->
+        <!--style="@style/Widget.AppCompat.SeekBar.Discrete"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:max="10"-->
+        <!--android:progress="3"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toEndOf="@+id/picture"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
+
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/exposure_label"
             android:layout_width="wrap_content"
-            android:layout_height="19dp"
+            android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/control"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="TextView"
+            android:text="@string/exposure_label"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/picture"
             app:layout_constraintTop_toBottomOf="@+id/exposure_slider" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/iso_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="TextView"
+            android:text="@string/iso_label"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/picture"
             app:layout_constraintStart_toStartOf="parent"

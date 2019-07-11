@@ -27,14 +27,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void takePicture(View view) {
-        Intent intent = new Intent(this, TakePicture.class);
-        startActivity(intent);
-    }
-
     public void openCamera(View view) {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.camera_container, Camera2BasicFragment.newInstance())
+                .replace(R.id.camera_container, CameraFragment.newInstance())
                 .commit();
     }
 
