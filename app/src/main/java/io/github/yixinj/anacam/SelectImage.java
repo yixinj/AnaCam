@@ -52,7 +52,7 @@ public class SelectImage extends AppCompatActivity {
 
     public void analyseImage(View view) {
         if (path != null) {
-            Intent intent = new Intent(this, Analysis.class);
+            Intent intent = new Intent(this, Result.class);
             intent.putExtra("path", path);
             intent.putExtra("numContours", 3);
             startActivity(intent);

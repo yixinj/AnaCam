@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -42,8 +43,10 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -57,9 +60,11 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -311,21 +316,21 @@ public class CameraFragment extends Fragment
                 }
                 case STATE_WAITING_PRECAPTURE: {
                     // CONTROL_AE_STATE can be null on some devices
-                    Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
-                    if (aeState == null ||
-                            aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE ||
-                            aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED) {
-                        mState = STATE_WAITING_NON_PRECAPTURE;
-                    }
+//                    Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
+//                    if (aeState == null ||
+//                            aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE ||
+//                            aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED) {
+//                        mState = STATE_WAITING_NON_PRECAPTURE;
+//                    }
                     break;
                 }
                 case STATE_WAITING_NON_PRECAPTURE: {
-                    // CONTROL_AE_STATE can be null on some devices
-                    Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
-                    if (aeState == null || aeState != CaptureResult.CONTROL_AE_STATE_PRECAPTURE) {
-                        mState = STATE_PICTURE_TAKEN;
-                        captureStillPicture();
-                    }
+//                    // CONTROL_AE_STATE can be null on some devices
+//                    Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
+//                    if (aeState == null || aeState != CaptureResult.CONTROL_AE_STATE_PRECAPTURE) {
+//                        mState = STATE_PICTURE_TAKEN;
+//                        captureStillPicture();
+//                    }
                     break;
                 }
             }
@@ -432,7 +437,10 @@ public class CameraFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mFile = new File(Objects.requireNonNull(getActivity()).getExternalFilesDir(null), "pic.jpg");
+        File storageLoc = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String fileName = String.format("%d.jpg", System.currentTimeMillis());
+        mFile = new File(storageLoc, fileName);
+//        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
     }
 
     @Override
@@ -802,15 +810,11 @@ public class CameraFragment extends Fragment
         }
     }
 
-    private void captureStillPicture() {
-        captureStillPicture(1600, 100000L);
-    }
-
     /**
      * Capture a still picture. This method should be called when we get a response in
      * {@link #mCaptureCallback} from both {@link #lockFocus()}.
      */
-    private void captureStillPicture(int iso, long exposure) {
+    private void captureStillPicture() {
         try {
             final Activity activity = getActivity();
             if (null == activity || null == mCameraDevice) {
@@ -829,6 +833,14 @@ public class CameraFragment extends Fragment
             captureBuilder.set(CaptureRequest.CONTROL_AE_MODE,
                     CaptureRequest.CONTROL_AE_MODE_OFF);
 
+            EditText isoInput = (EditText) getView().findViewById(R.id.iso_value);
+            EditText exposureInput = (EditText) getView().findViewById(R.id.exposure_value);
+
+            int iso = Integer.parseInt(isoInput.getText().toString());
+            Long exposure = Long.parseLong(exposureInput.getText().toString());
+            Log.d("settings", Integer.toString(iso));
+            Log.d("settings", Long.toString(exposure));
+
             // Set ISO and Exposure
             captureBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, iso);
             captureBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, exposure);
@@ -836,6 +848,8 @@ public class CameraFragment extends Fragment
             // Orientation
             int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
+
+            showToast("Please wait ...");
 
             CameraCaptureSession.CaptureCallback CaptureCallback
                     = new CameraCaptureSession.CaptureCallback() {
