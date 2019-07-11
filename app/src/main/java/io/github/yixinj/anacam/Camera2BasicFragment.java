@@ -428,7 +428,6 @@ public class Camera2BasicFragment extends Fragment
     @Override
     public void onViewCreated(@NonNull final View view, Bundle savedInstanceState) {
         view.findViewById(R.id.picture).setOnClickListener(this);
-        view.findViewById(R.id.info).setOnClickListener(this);
         mTextureView = view.findViewById(R.id.texture);
     }
 
@@ -850,7 +849,8 @@ public class Camera2BasicFragment extends Fragment
                     showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
                     unlockFocus();
-//                    setAuto(captureBuilder);
+                    // Turn on AE and AWB for the preview
+                    setAuto(captureBuilder);
                 }
             };
 
@@ -902,16 +902,6 @@ public class Camera2BasicFragment extends Fragment
         switch (view.getId()) {
             case R.id.picture: {
                 takePicture();
-                break;
-            }
-            case R.id.info: {
-                Activity activity = getActivity();
-                if (null != activity) {
-                    new AlertDialog.Builder(activity)
-                            .setMessage(R.string.intro_message)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .show();
-                }
                 break;
             }
         }
@@ -1043,9 +1033,9 @@ public class Camera2BasicFragment extends Fragment
     }
 
     private void setAuto(CaptureRequest.Builder requestBuilder) {
-        // Turn on AE, AF, AWB
-        requestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+        // Turn on AE, AWB
+//        requestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+//                CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
         requestBuilder.set(CaptureRequest.CONTROL_AWB_MODE,
                 CaptureRequest.CONTROL_AWB_MODE_AUTO);
         requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
