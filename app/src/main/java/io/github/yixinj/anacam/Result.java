@@ -59,24 +59,11 @@ public class Result extends AppCompatActivity {
         int numContours = intent.getIntExtra("numContours", 3);
 
         Mat imgOutlined = AnacamUtilities.processImage(path, 3);
-
-//        Mat mat = new Mat();
-//
         // find the imageview and draw it!
-//        File imgFile = new  File(path);
         ImageView imageView = (ImageView) findViewById(R.id.analysis_image_preview);
-//        if(imgFile.exists()){
-//            Bitmap bmp = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-//            imageView.setImageBitmap(bmp);
-//            Mat mat = new Mat();
-//            Bitmap bmp32 = bmp.copy(Bitmap.Config.ARGB_8888, true);
-//            Utils.bitmapToMat(bmp32, mat);
-//        }
-
         // convert to bitmap:
         Bitmap bm = Bitmap.createBitmap(imgOutlined.cols(), imgOutlined.rows(),Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(imgOutlined, bm);
-
         // find the imageview and draw it!
         imageView.setImageBitmap(bm);
 
