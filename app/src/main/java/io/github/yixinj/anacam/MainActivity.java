@@ -3,7 +3,7 @@
 package io.github.yixinj.anacam;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 // Your IDE likely can auto-import these classes, but there are several

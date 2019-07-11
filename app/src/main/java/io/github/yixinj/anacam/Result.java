@@ -2,10 +2,13 @@ package io.github.yixinj.anacam;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
+
+import com.github.chrisbanes.photoview.PhotoViewAttacher;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
@@ -15,6 +18,9 @@ import org.opencv.core.Mat;
 
 
 public class Result extends AppCompatActivity {
+
+    ImageView mImageView;
+    PhotoViewAttacher mAttacher;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -34,8 +40,7 @@ public class Result extends AppCompatActivity {
     };
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         if (!OpenCVLoader.initDebug()) {
             Log.d("OpenCV", "Internal OpenCV library not found. Using OpenCV Manager for initialization");
@@ -50,7 +55,12 @@ public class Result extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
-//        displayImage();
+
+        // Gets image view
+        mImageView = (ImageView) findViewById(R.id.result_image);
+
+        // Attach a PhotoViewAttacher, which takes care of all of the zooming functionality.
+        mAttacher = new PhotoViewAttacher(mImageView);
     }
 
     private void displayImage() {
@@ -60,12 +70,11 @@ public class Result extends AppCompatActivity {
 
         Mat imgOutlined = AnacamUtilities.processImage(path, 3);
         // find the imageview and draw it!
-        ImageView imageView = (ImageView) findViewById(R.id.analysis_image_preview);
         // convert to bitmap:
-        Bitmap bm = Bitmap.createBitmap(imgOutlined.cols(), imgOutlined.rows(),Bitmap.Config.ARGB_8888);
+        Bitmap bm = Bitmap.createBitmap(imgOutlined.cols(), imgOutlined.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(imgOutlined, bm);
         // find the imageview and draw it!
-        imageView.setImageBitmap(bm);
+        mImageView.setImageBitmap(bm);
 
     }
 }
