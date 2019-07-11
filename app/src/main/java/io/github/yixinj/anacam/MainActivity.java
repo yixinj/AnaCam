@@ -1,3 +1,5 @@
+// TODO: Add license to everything (summarized here: https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
+
 package io.github.yixinj.anacam;
 
 import android.content.Intent;
