@@ -7,10 +7,10 @@
     tools:context=".Result">
 
 
-    <ImageView
+    <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/result_image"
-        android:layout_width="356dp"
-        android:layout_height="658dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"

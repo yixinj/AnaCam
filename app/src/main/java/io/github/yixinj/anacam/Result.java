@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.github.chrisbanes.photoview.PhotoView;
 import com.github.chrisbanes.photoview.PhotoViewAttacher;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -19,8 +20,7 @@ import org.opencv.core.Mat;
 
 public class Result extends AppCompatActivity {
 
-    ImageView mImageView;
-    PhotoViewAttacher mAttacher;
+    PhotoView mPhotoView;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -55,12 +55,6 @@ public class Result extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
-
-        // Gets image view
-        mImageView = (ImageView) findViewById(R.id.result_image);
-
-        // Attach a PhotoViewAttacher, which takes care of all of the zooming functionality.
-        mAttacher = new PhotoViewAttacher(mImageView);
     }
 
     private void displayImage() {
@@ -68,13 +62,13 @@ public class Result extends AppCompatActivity {
         String path = intent.getStringExtra("path");
         int numContours = intent.getIntExtra("numContours", 3);
 
-        Mat imgOutlined = AnacamUtilities.processImage(path, 3);
-        // find the imageview and draw it!
-        // convert to bitmap:
+        // Gets image view
+        mPhotoView= (PhotoView) findViewById(R.id.result_image);
+
+        Mat imgOutlined = AnacamUtilities.processImage(path, 3, 50);
         Bitmap bm = Bitmap.createBitmap(imgOutlined.cols(), imgOutlined.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(imgOutlined, bm);
-        // find the imageview and draw it!
-        mImageView.setImageBitmap(bm);
+        mPhotoView.setImageBitmap(bm);
 
     }
 }

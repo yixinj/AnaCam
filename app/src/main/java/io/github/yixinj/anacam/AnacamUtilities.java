@@ -14,18 +14,17 @@ import java.util.List;
 
 public class AnacamUtilities {
 
-    public static Mat processImage(String path, int numContours) {
+    public static Mat processImage(String path, int numContours, int threshMin) {
 //        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-//        Log.d("opencv", "Library loaded");
         Mat img = Imgcodecs.imread(path);
         Mat imgGray = new Mat();
         Imgproc.cvtColor(img, imgGray, Imgproc.COLOR_BGR2GRAY);
         Mat imgHsv = new Mat();
         Imgproc.cvtColor(img, imgHsv, Imgproc.COLOR_BGR2HSV);
 
-        Mat thresh = getThreshold(imgGray, 100);
+        Mat thresh = getThreshold(imgGray, threshMin);
 //        Imgcodecs.imwrite("img/thresh.jpg", thresh);
-        List<MatOfPoint> contours = getContours(thresh, 3);
+        List<MatOfPoint> contours = getContours(thresh, numContours);
 
         // Saves masks
         List<Mat> masks = generateMasks(img, contours);
@@ -43,14 +42,17 @@ public class AnacamUtilities {
 
             Moments m = Imgproc.moments(contours.get(i));
             Point p = new Point(Math.round(m.m10 / m.m00), Math.round(m.m01 / m.m00));
-            String t = Double.toString(hueValues.get(i)).substring(0, 5);
+            String t = Double.toString(hueValues.get(i)*2).substring(0, 5);
             Imgproc.putText(imgOutlined, t, p, 0, 1, new Scalar(0, 0, 255), 3);
         }
 //        Imgcodecs.imwrite("img/outlined.jpg", imgOutlined);
 
         System.out.println(hueValues);
 
-        return imgOutlined;
+        Mat imgFinal = new Mat();
+        Imgproc.cvtColor(imgOutlined, imgFinal, Imgproc.COLOR_BGR2RGB);
+
+        return imgFinal;
     }
 
 
@@ -120,7 +122,7 @@ public class AnacamUtilities {
     }
 
     /**
-     * Find mean BGR from each contour (using masks) on the image specified
+     * Find mean HUE from each contour (using masks) on the image specified
      *
      * @param img   source image to find mean of
      * @param masks

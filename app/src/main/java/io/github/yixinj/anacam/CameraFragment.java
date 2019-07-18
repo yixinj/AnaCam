@@ -22,6 +22,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
@@ -41,6 +42,8 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -51,6 +54,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -63,6 +69,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -72,6 +79,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -247,7 +256,7 @@ public class CameraFragment extends Fragment
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile, getContext()));
 //            analyseImage();
         }
 
@@ -279,6 +288,11 @@ public class CameraFragment extends Fragment
      * Orientation of the camera sensor
      */
     private int mSensorOrientation;
+
+    //    Current time for saving the image
+    private long currentTime;
+    File storageLoc;
+    String fileName;
 
     /**
      * A {@link CameraCaptureSession.CaptureCallback} that handles events related to JPEG capture.
@@ -435,10 +449,22 @@ public class CameraFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        File storageLoc = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        String fileName = String.format("%d.jpg", System.currentTimeMillis());
-        mFile = new File(storageLoc, fileName);
+        storageLoc = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+        updateFile();
+
+//        TODO: Instantly refresh gallery
+
 //        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
+    }
+
+
+    //    Update the file name
+    public void updateFile() {
+        currentTime = System.currentTimeMillis();
+        fileName = String.format("%d.jpg", currentTime);
+
+        mFile = new File(storageLoc, fileName);
     }
 
     @Override
@@ -835,7 +861,7 @@ public class CameraFragment extends Fragment
             EditText exposureInput = (EditText) getView().findViewById(R.id.exposure_value);
 
             int iso = Integer.parseInt(isoInput.getText().toString());
-            Long exposure = Long.parseLong(exposureInput.getText().toString());
+            Long exposure = Long.parseLong(exposureInput.getText().toString()) * 1000000000;
             Log.d("settings", Integer.toString(iso));
             Log.d("settings", Long.toString(exposure));
 
@@ -847,7 +873,10 @@ public class CameraFragment extends Fragment
             int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
 
-            showToast("Please wait ...");
+            showToast("Please wait " + exposure/1000000000 + " second(s)");
+
+//            Update the file name
+            updateFile();
 
             CameraCaptureSession.CaptureCallback CaptureCallback
                     = new CameraCaptureSession.CaptureCallback() {
@@ -871,6 +900,8 @@ public class CameraFragment extends Fragment
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+
+
     }
 
     /**
@@ -911,7 +942,17 @@ public class CameraFragment extends Fragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.picture: {
-                takePicture();
+                showToast("10s timer started");
+                final int interval = 10000; // 1 Second
+                Handler handler = new Handler();
+                Runnable runnable = new Runnable(){
+                    public void run() {
+                        takePicture();
+
+                    }
+                };
+                handler.postAtTime(runnable, System.currentTimeMillis()+interval);
+                handler.postDelayed(runnable, interval);
                 break;
             }
         }
@@ -931,9 +972,12 @@ public class CameraFragment extends Fragment
          */
         private final File mFile;
 
-        ImageSaver(Image image, File file) {
+        private Context mContext;
+
+        ImageSaver(Image image, File file, Context context) {
             mImage = image;
             mFile = file;
+            mContext = context;
         }
 
         @Override
@@ -945,6 +989,12 @@ public class CameraFragment extends Fragment
             try {
                 output = new FileOutputStream(mFile);
                 output.write(bytes);
+
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                File f = new File(mFile.toURI());
+                Uri contentUri = Uri.fromFile(f);
+                mediaScanIntent.setData(contentUri);
+                mContext.sendBroadcast(mediaScanIntent);
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -1040,6 +1090,7 @@ public class CameraFragment extends Fragment
                             })
                     .create();
         }
+
     }
 
     private void setAuto(CaptureRequest.Builder requestBuilder) {
@@ -1050,6 +1101,17 @@ public class CameraFragment extends Fragment
                 CaptureRequest.CONTROL_AWB_MODE_AUTO);
         requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
                 CaptureRequest.CONTROL_AE_MODE_ON);
+    }
+
+    private void countDown(final int seconds) {
+        for (int i = 0; i < seconds; i++) {
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    showToast(String.valueOf(seconds));
+                }
+            }, 1000);
+        }
     }
 
 }
